@@ -6,6 +6,7 @@ class Numar_Complex{
     double re, im;
 public:
     Numar_Complex();//initializare
+    Numar_Complex(double, double);//initializare parametrizat
     Numar_Complex(const Numar_Complex &);//copiere
     ~Numar_Complex();
     void set_re(double);
@@ -14,6 +15,7 @@ public:
     double get_im();
     void display();
     void modul();
+    friend void modul(Numar_Complex); ///metoda in fct friend;
     Numar_Complex negativ();
     Numar_Complex inmultireScalar(double a);
     Numar_Complex radical();
@@ -21,6 +23,8 @@ public:
     Numar_Complex operator *(const Numar_Complex &);
     Numar_Complex operator /(const Numar_Complex &);
     Numar_Complex operator =(const Numar_Complex &);
+    Numar_Complex operator --();
+    Numar_Complex operator --(int a);
     friend ostream & operator <<(ostream &, Numar_Complex&);
     friend istream & operator >>(istream &, Numar_Complex&);
     friend void ecuatie (Numar_Complex, Numar_Complex, Numar_Complex);
@@ -30,25 +34,43 @@ class Manager{
     int n;
     Numar_Complex *z;
     public:
-    Manager();
+    //Manager();
     ~Manager();
+    Numar_Complex & operator [](int);
+    friend ostream & operator <<(ostream &, Manager&);
+    friend istream & operator >>(istream &, Manager&);
     void citire();
     void afisare();
     void get_z();
 };
 
-Manager :: Manager()
+/*Manager :: Manager()
 {
     cout<<"Introduceti numarul de elemente: n=";
     cin>>n;
     z=new Numar_Complex[n];
+}*/
+
+
+istream & operator >>(istream &in, Manager& m)
+{
+    cout<<"Introduceti numarul de elemente: n=";
+    in>>m.n;
+    m.z=new Numar_Complex[m.n];
+    for(int i=0;i<m.n;i++)
+        in>>m.z[i];
+    return in;
 }
 
-void Manager :: citire()
+ostream & operator <<(ostream & out, Manager& m)
 {
-
-    for(int i=0;i<n;i++)
-        cin>>z[i];
+    out<<"Cele "<<m.n<<" numere complexe sunt:"<<endl;
+    for(int i=0;i<m.n;i++)
+    {
+       out<<"Z"<<i+1<<"=";
+       out<<m.z[i]<<endl;
+    }
+    return out;
 }
 
 Manager :: ~Manager()
@@ -56,7 +78,7 @@ Manager :: ~Manager()
     delete [] z;
 }
 
-void Manager :: afisare()
+/*void Manager :: afisare()
 {
     cout<<"Cele "<<n<<" numere complexe sunt:"<<endl;
     for(int i=0;i<n;i++)
@@ -65,6 +87,11 @@ void Manager :: afisare()
        cout<<z[i]<<endl;
     }
 
+}*/
+
+Numar_Complex & Manager :: operator [](int poz)
+{
+    return z[poz];
 }
 
 Numar_Complex Numar_Complex :: negativ()
@@ -100,6 +127,11 @@ Numar_Complex  Numar_Complex :: radical()
 void Numar_Complex :: modul()
 {
     cout<<"|z|="<<sqrt(re*re+im*im)<<endl;
+}
+
+void modul(Numar_Complex z)
+{
+    cout<<"|z|="<<sqrt(z.re*z.re+z.im*z.im)<<endl;
 }
 
 void Numar_Complex :: set_re(double re)
@@ -143,10 +175,31 @@ Numar_Complex :: Numar_Complex()
     im=0;
 }
 
+Numar_Complex :: Numar_Complex(double x, double y)
+{
+    re=x;
+    im=y;
+}
+
 Numar_Complex :: Numar_Complex(const Numar_Complex &ob)
 {
     re=ob.re;
     im=ob.im;
+}
+
+Numar_Complex Numar_Complex :: operator --()
+{
+    re--;
+    im--;
+    return *this;
+}
+
+
+Numar_Complex Numar_Complex :: operator --(int a)
+{
+    re--;
+    im--;
+    return *this;
 }
 
 Numar_Complex Numar_Complex :: operator +(const Numar_Complex &ob)
@@ -243,13 +296,15 @@ void ecuatie (Numar_Complex z1, Numar_Complex z2, Numar_Complex z3)
 
 int main()
 {
+    Numar_Complex b(2,3);
+    cout<<b<<endl;
     Numar_Complex z, c, r, y;//
      /*//z.set_re(2);
     z.set_im(3);
     Numar_Complex y;
     y.set_re(1);
     y.set_im(1);//*/
-    cin>>z;
+    /*cin>>z;
     cout<<"Z=";
     cout<<z<<endl;
     cin>>y;
@@ -291,11 +346,23 @@ int main()
     cin>>z2;
     cout<<"z3:"<<endl;
     cin>>z3;
-    ecuatie(z1,z2,z3);
+    ecuatie(z1,z2,z3);*/
 
     Manager m;
-    m.citire();
-    m.afisare();
+    cin>>m;
+    cout<<m;
+    cout<<"Introduceti indexul elementului dorit: i=";
+    int i;
+    //cin>>i;
+    //cout<<"Elementul de pe pozitia "<<i<<" este: z="<<m[i-1]<<endl;
+    //m[0]=m[1]=(m[2]+m[3]);
+    cout<<m;
+    cout<<"Modul de m[1]: ";
+    modul(m[1]);
+    m[1]--;
+    cout<<"m[1]-- = "<<m[1]<<endl;
+    --m[0];
+    cout<<"--m[0] = "<<m[0]<<endl;
 
     return 0;
 }
